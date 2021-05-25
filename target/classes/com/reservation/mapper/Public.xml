@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.reservation.mapper.PublicMapper">
+
+    <resultMap id="announcement" type="com.reservation.pojo.Announcement">
+        <id column="id" property="id" />
+        <result column="title" property="title" />
+        <result column="content" property="content" />
+        <result column="create_time" property="create_time" />
+        <result column="mgr_name" property="mgr_name" />
+        <result column="col_id" property="col_id" />
+    </resultMap>
+
+    <resultMap id="admin" type="com.reservation.pojo.Admin">
+        <id column="mgr_num" property="mgr_num" />
+        <result column="mgr_name" property="mgr_name" />
+        <result column="mgr_tele" property="mgr_tele" />
+        <result column="mgr_email" property="mgr_email" />
+        <result column="col_name" property="col_name" />
+    </resultMap>
+
+    <resultMap id="laboratory" type="com.reservation.pojo.Laboratory">
+        <result column="lab_id" property="lab_id" />
+        <result column="lab_name" property="lab_name" />
+        <result column="lab_addr" property="lab_addr" />
+        <result column="description" property="description" />
+        <result column="lab_capacity" property="lab_capacity" />
+        <result column="mgr_name" property="mgr_name" />
+        <result column="mgr_tel" property="mgr_tel" />
+        <result column="col_id" property="col_id" />
+        <result column="statement" property="statement" />
+        <result column="mgr_num" property="mgr_num" />
+    </resultMap>
+
+    <resultMap id="schedule" type="com.reservation.pojo.Schedule">
+        <result column="schedule_id" property="schedule_id" />
+        <result column="lab_id" property="lab_id" />
+        <result column="lab_name" property="lab_name" />
+        <result column="schedule_date" property="schedule_date" />
+        <result column="T1" property="T1" />
+        <result column="T2" property="T2" />
+        <result column="T3" property="T3" />
+        <result column="T4" property="T4" />
+        <result column="T5" property="T5" />
+    </resultMap>
+
+    <select id="getAnnouncement" resultMap="announcement">
+        select * from announcement order by create_time
+    </select>
+
+    <select id="getAnnouncementByCol_id" parameterType="int" resultMap="announcement">
+        select * from announcement  where   col_id=#{col_id} order by create_time desc
+    </select>
+
+    <select id="getAllLaboratory" resultMap="laboratory">
+        select * from laboratory order by col_id
+    </select>
+
+    <select id="getLaboratoryByCol_id" parameterType="int"  resultMap="laboratory">
+        select * from laboratory where col_id=#{col_id} order by lab_id
+    </select>
+
+    <select id="getLaboratoryLikeSearch_text" parameterType="String"  resultMap="laboratory">
+        select *  from laboratory where lab_name like concat('%', #{search_text}, '%') or lab_id like concat('%', #{search_text}, '%')
+                                            or lab_addr like concat('%', #{search_text}, '%') or mgr_name like concat('%', #{search_text}, '%')
+                                            or description like concat('%', #{search_text}, '%') or col_name like concat('%', #{search_text}, '%')
+                                            or col_id like concat('%', #{search_text}, '%') or mgr_num like concat('%', #{search_text}, '%')
+    </select>
+<!--    UNIX_TIMESTAMP(flightDate)=UNIX_TIMESTAMP('2017-12-28')-->
+
+    <select id="getLaboratoryByLimit1"  resultMap="laboratory">
+         select *  from laboratory where col_id=#{0} and lab_name like concat('%', #{1}, '%')
+                                            and  lab_id like concat('%', #{2}, '%') and  statement=#{3}
+    </select>
+
+    <select id="getLaboratoryByLimit2"  resultMap="laboratory">
+         select *  from laboratory where col_id=#{0} and lab_name like concat('%', #{1}, '%')
+                                            and  lab_id like concat('%', #{2}, '%')
+    </select>
+
+    <select id="getLaboratoryByLimit3"  resultMap="laboratory">
+         select *  from laboratory where  lab_name like concat('%', #{0}, '%')
+                                            and  lab_id like concat('%', #{1}, '%') and  statement=#{2}
+    </select>
+
+    <select id="getLaboratoryByLimit4"  resultMap="laboratory">
+         select *  from laboratory where lab_name like concat('%', #{0}, '%')
+                                            and  lab_id like concat('%', #{1}, '%')
+    </select>
+
+    <select id="getLaboratoryByLab_id"  parameterType="String"  resultType="Laboratory">
+        select * from laboratory where  lab_id=#{lab_id}
+    </select>
+
+    <select id="getSchedulesByLab_id" parameterType="String" resultMap="schedule">
+        select * from schedule  where lab_id=#{lab_id} order by schedule_date desc limit 5
+    </select>
+
+    <insert id="addReservation" >
+        insert into reservation(user_num,user_type,lab_name,lab_addr,col_name,reserve_type,courseName,reserve_date,time_interval,description)
+                        values(#{0},#{1},#{2},#{3},#{4},#{5},#{6},#{7},#{8},#{9})
+    </insert>
+
+    <select id="containsReserve" resultType="Reservation">
+        select * from reservation where lab_name=#{0} and reserve_date=#{1} and time_interval=#{2} and user_num=#{3}
+    </select>
+
+    <delete id="cancelReservation" parameterType="int">
+        delete from reservation where reserve_id=#{reserve_id}
+    </delete>
+
+    <update id="updateScheduleAddT1" >
+        update schedule set T1=T1+1  where lab_id=#{0} and schedule_date=#{1}
+    </update>
+
+    <update id="updateScheduleAddT2" >
+        update schedule set T2=T2+1  where lab_id=#{0} and schedule_date=#{1}
+    </update>
+
+    <update id="updateScheduleAddT3" >
+        update schedule set T3=T3+1  where lab_id=#{0} and schedule_date=#{1}
+    </update>
+
+    <update id="updateScheduleAddT4" >
+        update schedule set T4=T4+1  where lab_id=#{0} and schedule_date=#{1}
+    </update>
+
+    <update id="updateScheduleAddT5" >
+        update schedule set T5=T5+1  where lab_id=#{0} and schedule_date=#{1}
+    </update>
+
+    <select id="containsSchedule" resultType="Schedule">
+        select  * from schedule where lab_id=#{0} and schedule_date=#{1}
+    </select>
+
+    <select id="getCol_nameByCol_id" parameterType="int" resultType="String">
+        select col_name from college where col_id=#{0}
+    </select>
+
+    <update id="updateScheduleSubT1" >
+        update schedule set T1=T1-1  where lab_name=#{0} and schedule_date=#{1}
+    </update>
+
+    <update id="updateScheduleSubT2" >
+        update schedule set T2=T2-1  where lab_name=#{0} and schedule_date=#{1}
+    </update>
+
+    <update id="updateScheduleSubT3" >
+        update schedule set T3=T3-1  where lab_name=#{0} and schedule_date=#{1}
+    </update>
+
+    <update id="updateScheduleSubT4" >
+        update schedule set T4=T4-1  where lab_name=#{0} and schedule_date=#{1}
+    </update>
+
+    <update id="updateScheduleSubT5" >
+        update schedule set T5=T5-1  where lab_name=#{0} and schedule_date=#{1}
+    </update>
+
+    <!--    UNIX_TIMESTAMP(flightDate)=UNIX_TIMESTAMP('2017-12-28')-->
+    <select id="getLaboratoryBySearch_textAndCol_id"   resultMap="laboratory">
+        select *  from laboratory where lab_name like concat('%', #{0}, '%') and col_id=#{1}  or lab_id like concat('%', #{0}, '%') and col_id=#{1}
+                                            or lab_addr like concat('%', #{0}, '%') and col_id=#{1}  or mgr_name like concat('%', #{0}, '%') and col_id=#{1}
+                                            or description like concat('%', #{0}, '%') and col_id=#{1}  or col_name like concat('%', #{0}, '%') and col_id=#{1}
+                                            or mgr_num like concat('%', #{0}, '%') and col_id=#{1}
+    </select>
+
+    <select id="containsLaboratory"  parameterType="String"  resultType="Laboratory">
+        select * from laboratory  where  lab_id=#{lab_id}
+    </select>
+
+    <select id="getAnnouncementBySearch_textAndCol_id"   resultMap="announcement">
+        select *  from announcement where id like concat('%', #{0}, '%') and col_id=#{1}  or title like concat('%', #{0}, '%') and col_id=#{1}
+                                            or content like concat('%', #{0}, '%') and col_id=#{1}  or create_time like concat('%', #{0}, '%') and col_id=#{1}
+                                            or mgr_name like concat('%', #{0}, '%') and col_id=#{1} order by create_time
+    </select>
+
+    <delete id="removeAnnoById" parameterType="int">
+        delete from announcement where id=#{id}
+    </delete>
+
+    <select id="getLab_nameByLab_id" parameterType="String" resultType="String">
+        select lab_name from laboratory where lab_id=#{lab_id}
+    </select>
+
+    <update id="updateScheduleLab_name" >
+        update schedule set lab_name=#{1} where lab_id=#{0};
+    </update>
+
+    <insert id="addLabSchedule_mon" parameterType="String">
+        insert ignore into schedule(lab_id,schedule_date,T1,T2,T3,T4,T5) values(#{id},DATE_ADD(curdate(),INTERVAL 3 DAY),0,0,0,0,0);
+    </insert>
+
+    <insert id="addLabSchedule_tue" parameterType="String">
+        insert ignore into schedule(lab_id,schedule_date,T1,T2,T3,T4,T5) values(#{id},DATE_ADD(curdate(),INTERVAL 4 DAY),0,0,0,0,0);
+    </insert>
+
+    <insert id="addLabSchedule_wes" parameterType="String">
+        insert ignore into schedule(lab_id,schedule_date,T1,T2,T3,T4,T5) values(#{id},DATE_ADD(curdate(),INTERVAL 5 DAY),0,0,0,0,0);
+    </insert>
+
+    <insert id="addLabSchedule_thu" parameterType="String">
+        insert ignore into schedule(lab_id,schedule_date,T1,T2,T3,T4,T5) values(#{id},DATE_ADD(curdate(),INTERVAL 6 DAY),0,0,0,0,0);
+    </insert>
+
+    <insert id="addLabSchedule_fri" parameterType="String">
+        insert ignore into schedule(lab_id,schedule_date,T1,T2,T3,T4,T5) values(#{id},DATE_ADD(curdate(),INTERVAL 7 DAY),0,0,0,0,0);
+    </insert>
+
+    <select id="containSchedule" resultType="Schedule">
+        select * from schedule where lab_id=#{id} and reserve_date between curdate() and DATE_ADD(curdate(),INTERVAL 14 DAY);
+    </select>
+
+    <delete id="del_duplicate_data" parameterType="int">
+        DELETE
+FROM
+	schedule
+WHERE
+	(lab_id,lab_name, schedule_date) IN (
+		SELECT
+		    s.lab_id,
+			s.lab_name,
+			s.schedule_date
+		FROM
+			(
+				SELECT
+					lab_id,lab_name, schedule_date
+				FROM
+					schedule
+				GROUP BY
+					lab_id,lab_name, schedule_date
+				HAVING
+					count(1) > 1
+			) s
+	)
+AND schedule_id NOT IN (
+	SELECT
+		ss.minschedule_id
+	FROM
+		(
+			SELECT
+				min(schedule_id) AS minschedule_id
+			FROM
+				schedule
+			GROUP BY
+				lab_id,lab_name,schedule_date
+			HAVING
+				count(1) > 1
+		) ss
+)
+    </delete>
+
+    <insert id="InputExcel">
+        insert ignore into user(user_num,user_name,user_type,sex,sClass,col_name,dept,col_id) values (#{user_num},#{user_name},#{user_type},#{sex},#{sClass},#{col_name},#{dept},#{col_id});
+
+	</insert>
+
+    <insert id="InputLabExcel">
+       insert ignore into laboratory(lab_id, lab_name, lab_addr, description, lab_capacity, mgr_name, mgr_tel, col_id,statement,mgr_num,col_name)
+                            values(#{lab_id},#{lab_name},#{lab_addr},#{description},#{lab_capacity},#{mgr_name},#{mgr_tel},#{col_id},#{statement},#{mgr_num},#{col_name});
+	</insert>
+
+    <delete id="removeScheduleByLab_id">
+        delete from schedule where lab_id=#{id}
+    </delete>
+
+    <select id="getAllMgr" resultMap="admin">
+        select * from admin
+    </select>
+
+    <select id="getAdminBySearch_text" resultMap="admin">
+        select *  from admin where mgr_num like concat('%', #{0}, '%')
+                                            or mgr_name like concat('%', #{0}, '%')
+                                            or col_name like concat('%', #{0}, '%')
+                                            or col_id like concat('%', #{0}, '%')
+    </select>
+
+    <delete id="removeAdminByMgr_num" parameterType="int">
+        delete from admin where mgr_num=#{mgr_num}
+    </delete>
+
+    <select id="getCol_idByCol_name" resultType="int">
+        select col_id from college where col_name like concat('%',#{col_name},'%')
+    </select>
+
+    <select id="containsAdmin" resultMap="admin">
+        select * from admin where mgr_num=#{mgr_num}
+    </select>
+
+    <insert id="addAdmin" >
+        insert ignore into admin(mgr_num,mgr_name,col_name,col_id) values(#{0},#{1},#{2},#{3})
+    </insert>
+
+    <update id="editMgrInfo">
+        update admin set mgr_name=#{1},col_name=#{2},col_id=#{3} where mgr_num=#{0}
+    </update>
+
+    <insert id="InputAdminExcel">
+       insert ignore into admin(mgr_num, mgr_name,col_name,col_id)
+                            values(#{mgr_num},#{mgr_name},#{col_name},#{col_id});
+	</insert>
+
+</mapper>

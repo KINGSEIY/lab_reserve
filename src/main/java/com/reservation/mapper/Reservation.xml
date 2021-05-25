@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.reservation.mapper.ReservationMapper">
+
+
+    <resultMap id="reservations" type="com.reservation.pojo.Reservation">
+        <id column="id" property="id" />
+        <result column="reserve_id" property="reserve_id" />
+        <result column="user_num" property="user_num" />
+        <result column="lab_name" property="lab_name" />
+        <result column="lab_addr" property="lab_addr" />
+        <result column="lab_college" property="lab_college" />
+        <result column="reserve_type" property="reserve_type" />
+        <result column="courseName" property="courseName" />
+        <result column="reserve_date" property="reserve_date" />
+        <result column="time_interval" property="time_interval" />
+        <result column="description" property="description" />
+        <result column="create_time" property="create_time" />
+        <result column="statement" property="statement" />
+    </resultMap>
+
+    <select id="getReservationByUser_num" parameterType="String" resultMap="reservations">
+        select * from reservation where user_num=#{user_num} order by reserve_date desc
+    </select>
+
+    <select id="getReservationByCol_name" parameterType="String" resultType="Reservation">
+        select * from reservation  where col_name like concat('%', #{col_name}, '%') order by reserve_date desc
+    </select>
+
+    <select id="getReservationBySearch_textAndCol_name" resultType="Reservation">
+        select * from reservation where reserve_id like concat('%', #{0}, '%') and col_name  like concat('%', #{1}, '%')
+                                            or user_num like concat('%', #{0}, '%') and col_name like concat('%', #{1}, '%')
+                                            or lab_name like concat('%', #{0}, '%') and col_name like concat('%', #{1}, '%')
+                                            or lab_addr like concat('%', #{0}, '%') and col_name like concat('%', #{1}, '%')
+                                            or reserve_type like concat('%', #{0}, '%') and col_name like concat('%', #{1}, '%')
+                                            or courseName like concat('%', #{0}, '%') and col_name like concat('%', #{1}, '%')
+                                            or time_interval like concat('%', #{0}, '%') and col_name like concat('%', #{1}, '%')
+                                            or description like concat('%', #{0}, '%') and col_name like concat('%', #{1}, '%')
+                                            or reserve_date like concat('%', #{0}, '%') and col_name like concat('%', #{1}, '%') order by reserve_date desc
+    </select>
+
+    <update id="passReserve" parameterType="int">
+        update reservation set statement=1 where reserve_id=#{reserve_id}
+    </update>
+
+    <update id="refuseReserve" parameterType="int">
+        update reservation set statement=2 where reserve_id=#{reserve_id}
+    </update>
+
+    <select id="getReservationByUser_typeAndStatement" resultType="Reservation">
+        select * from reservation  where user_type=#{0} and statement=#{1} and col_name like concat('%', #{2}, '%') order by reserve_date desc
+    </select>
+
+    <select id="getReservationByUser_type" resultType="Reservation">
+        select * from reservation  where user_type=#{0} and col_name like concat('%', #{1}, '%') order by reserve_date desc
+    </select>
+
+    <select id="getReservationByStatement" resultType="Reservation">
+        select * from reservation  where statement=#{0} and col_name like concat('%', #{1}, '%') order by reserve_date desc
+    </select>
+
+    <select id="getReservationByUser_typeAndStatementAndLimit_week" resultType="Reservation">
+        select * from reservation  where user_type=#{0} and statement=#{1} and col_name like concat('%', #{2}, '%') and reserve_date between curdate() and DATE_ADD(curdate(),INTERVAL 14 DAY) order by reserve_date desc
+    </select>
+
+    <select id="getReservationByUser_typeAndLimit_week" resultType="Reservation">
+        select * from reservation  where user_type=#{0} and col_name like concat('%', #{1}, '%') and reserve_date between curdate() and DATE_ADD(curdate(),INTERVAL 14 DAY) order by reserve_date desc
+    </select>
+
+    <select id="getReservationByStatementAndLimit_week" resultType="Reservation">
+        select * from reservation  where statement=#{0}  and col_name like concat('%', #{1}, '%') and reserve_date between curdate() and DATE_ADD(curdate(),INTERVAL 14 DAY) order by reserve_date desc
+    </select>
+
+    <select id="getReservationByUser_typeAndStatementAndLimit_month" resultType="Reservation">
+        select * from reservation  where user_type=#{0} and statement=#{1}  and col_name like concat('%', #{2}, '%') and reserve_date between  DATE_ADD(curdate(),INTERVAL -30 DAY) and DATE_ADD(curdate(),INTERVAL 14 DAY) order by reserve_date desc
+    </select>
+
+    <select id="getReservationByUser_typeAndLimit_month" resultType="Reservation">
+        select * from reservation  where user_type=#{0}  and col_name like concat('%', #{1}, '%') and reserve_date between  DATE_ADD(curdate(),INTERVAL -30 DAY) and DATE_ADD(curdate(),INTERVAL 14 DAY) order by reserve_date desc
+    </select>
+
+    <select id="getReservationByStatementAndLimit_month" resultType="Reservation">
+        select * from reservation  where statement=#{0}  and col_name like concat('%', #{1}, '%') and reserve_date between  DATE_ADD(curdate(),INTERVAL -30 DAY) and DATE_ADD(curdate(),INTERVAL 14 DAY) order by reserve_date desc
+    </select>
+
+    <select id="getReservationByLimit_week" resultType="Reservation">
+        select * from reservation  where col_name like concat('%', #{0}, '%') and reserve_date between curdate() and DATE_ADD(curdate(),INTERVAL 14 DAY) order by reserve_date desc
+    </select>
+
+    <select id="getReservationByLimit_month" resultType="Reservation">
+        select * from reservation  where  col_name like concat('%', #{0}, '%') and reserve_date between  DATE_ADD(curdate(),INTERVAL -30 DAY) and DATE_ADD(curdate(),INTERVAL 14 DAY) order by reserve_date desc
+    </select>
+
+    <delete id="deleteReserveList">
+        delete from reservation where reserve_id in
+        <foreach collection="array" item="ids" open="(" separator=","
+                 close=")">
+            #{ids}
+        </foreach>
+    </delete>
+
+    <update id="passReserveList">
+        update reservation  set statement=1  where reserve_id in
+        <foreach collection="array" item="ids" open="(" separator=","
+                 close=")">
+            #{ids}
+        </foreach>
+    </update>
+
+    <update id="refuseReserveList">
+        update reservation  set statement=2  where reserve_id in
+        <foreach collection="array" item="ids" open="(" separator=","
+                 close=")">
+            #{ids}
+        </foreach>
+    </update>
+
+    <select id="getReservationByLab_nameAndReserve_type"  resultType="Reservation">
+        select * from reservation  where lab_name=#{0} and reserve_type=#{1} and statement=1 and reserve_date between curdate() and DATE_ADD(curdate(),INTERVAL 14 DAY) order by reserve_date desc
+    </select>
+
+    <select id="getReservationByLab_name" resultType="Reservation">
+        select * from reservation  where lab_name=#{lab_name}
+    </select>
+
+    <delete id="deleteReservationByRes_id">
+        delete from reservation where reserve_id=#{reserve_id }
+    </delete>
+
+    <delete id="deleteReservationByUser_num">
+        delete from reservation where user_num=#{id}
+    </delete>
+</mapper>

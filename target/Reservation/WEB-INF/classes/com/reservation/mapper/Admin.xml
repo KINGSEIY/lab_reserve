@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.reservation.mapper.AdminMapper">
+
+    <resultMap id="userMap" type="com.reservation.pojo.User">
+        <result column="user_num" property="user_num" />
+        <result column="user_name" property="user_name" />
+        <result column="passwd" property="passwd" />
+        <result column="user_type" property="user_type" />
+        <result column="sex" property="sex" />
+        <result column="sClass" property="sClass" />
+        <result column="col_name" property="col_name" />
+        <result column="dept" property="dept" />
+        <result column="email" property="email" />
+        <result column="last_login_time" property="last_login_time" />
+        <result column="col_id" property="col_id" />
+    </resultMap>
+
+
+    <select id="getByLoginInfo" parameterType="LoginInfo" resultType="Admin">
+        select * from admin where mgr_num = #{user_num} and passwd = #{passwd}
+    </select>
+
+    <update id="updateLastLoginTime" parameterType="String">
+        update admin set last_login_time = now() where mgr_num = #{mgr_num}
+    </update>
+
+    <update id="updatePasswdByNum" >
+        update user set passwd = #{1},mgr_email=#{2} where mgr_num = #{0}
+    </update>
+
+    <select id="getByMgr_num" parameterType="String" resultType="Admin">
+        select * from admin where mgr_num = #{mgr_num}
+    </select>
+
+    <update id="updateMgrPasswordByNum">
+        update admin set passwd=#{1},mgr_email=#{2},mgr_tele=#{3} where mgr_num=#{0}
+    </update>
+
+    <update id="updateMgr_tele">
+        update admin set mgr_tele=#{0} where mgr_num=#{1}
+    </update>
+
+    <delete id="removeUserByNum" parameterType="String">
+        delete from user where user_num=#{user_num}
+    </delete>
+
+    <insert id="addStudent">
+        insert into user(user_num,user_name,user_type,sex,sClass,col_name,dept,col_id) values(#{0},#{1},#{2},#{3},#{4},#{5},#{6},#{7})
+    </insert>
+
+    <update id="editStudentInfoByUser_num">
+        update user set user_name=#{1},sex=#{2},sClass=#{3},col_name=#{4},dept=#{5},col_id=#{6} where user_num=#{0}
+    </update>
+
+    <insert id="addTeacher">
+        insert into user(user_num,user_name,user_type,sex,col_name,dept,col_id) values(#{0},#{1},#{2},#{3},#{4},#{5},#{6})
+    </insert>
+
+    <update id="editTeacherInfoByUser_num">
+        update user set user_name=#{1},sex=#{2},col_name=#{3},dept=#{4},col_id=#{5} where user_num=#{0}
+    </update>
+
+
+    <delete id="deleteList">
+        delete from user where user_num in
+        <foreach collection="array" item="ids" open="(" separator=","
+                 close=")">
+            #{ids}
+        </foreach>
+    </delete>
+
+    <insert id="addLaboratory">
+        insert into laboratory(lab_id, lab_name, lab_addr, description, lab_capacity, mgr_name, mgr_tel, col_id,statement,mgr_num,col_name)
+                            values(#{0},#{1},#{2},#{3},#{4},#{5},#{6},#{7},#{8},#{9},#{10})
+    </insert>
+
+    <delete id="removeLabList">
+        delete from laboratory where lab_id in
+        <foreach collection="array" item="ids" open="(" separator=","
+                 close=")">
+            #{ids}
+        </foreach>
+    </delete>
+
+    <delete id="removeLabByLab_id" parameterType="String" >
+        delete from laboratory where lab_id=#{lab_id}
+    </delete>
+
+    <update id="EditLabInfo">
+        update laboratory set lab_name=#{1},lab_addr=#{2},description=#{3},lab_capacity=#{4},mgr_name=#{5},mgr_tel=#{6},col_id=#{7},statement=#{8},mgr_num=#{9},col_name=#{10} where lab_id=#{0}
+    </update>
+
+    <insert id="addAnnouncement">
+        insert into announcement(title,content,create_time,mgr_name,col_id) values(#{0},#{1},now(),#{2},#{3})
+    </insert>
+
+    <delete id="removeAnnoList">
+        delete from announcement where id in
+        <foreach collection="array" item="ids" open="(" separator=","
+                 close=")">
+            #{ids}
+        </foreach>
+    </delete>
+
+
+
+</mapper>

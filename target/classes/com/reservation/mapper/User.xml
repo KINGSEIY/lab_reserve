@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.reservation.mapper.UserMapper">
+
+
+
+    <select id="getByLoginInfo" parameterType="LoginInfo" resultType="User">
+        select * from user where user_num = #{user_num} and passwd = #{passwd}
+    </select>
+
+    <insert id="add" parameterType="User">
+        insert into user(user_num,user_name,passwd,user_type,sex,sClass,col_name,dept,last_login_time,email,col_id) values (#{user_num},#{user_name},#{passwd},#{user_type},#{sex},#{sClass},#{col_name},#{dept}, now(),#{email},#{col_id})
+    </insert>
+
+    <update id="update" parameterType="User">
+        update user set  user_name=#{user_name},user_type=#{user_type},sex=#{sex},sClass=#{sClass},college=#{college},dept=#{dept},email=#{email} where user_num= #{user_num}
+    </update>
+
+    <update id="updatePasswdByNum" >
+        update user set passwd = #{1},email=#{2} where user_num = #{0}
+    </update>
+
+    <update id="updateLastLoginTime" parameterType="String">
+        update user set last_login_time = now() where user_num = #{user_num}
+    </update>
+
+    <delete id="delUserByNum" parameterType="String">
+        delete from user where user_num = #{user_num}
+    </delete>
+
+    <select id="getByUserNum" parameterType="String" resultType="User">
+        select * from user where user_num = #{user_num}
+    </select>
+
+    <select id="contains" parameterType="String" resultType="User">
+        select * from user where user_num = #{user_num}
+    </select>
+
+    <select id="getUserByCol_idAndUser_type"  resultType="User">
+        select *  from user where  col_id=#{0} and user_type=#{1}
+    </select>
+
+    <select id="getUserByCol_idAndUser_typeLimit"  resultType="User">
+        select *  from user where  col_id=#{0} and user_type=#{1}
+    </select>
+
+    <select id="getUserBySearch_textAndUser_type" resultType="User">
+        select *  from user where user_num like concat('%', #{0}, '%') and user_type=#{1} and col_id=#{2}
+                                            or user_name like concat('%', #{0}, '%') and user_type=#{1} and col_id=#{2}
+                                            or sClass like concat('%', #{0}, '%') and user_type=#{1} and col_id=#{2}
+                                            or dept like concat('%', #{0}, '%') and user_type=#{1} and col_id=#{2}
+                                            or sex like concat('%', #{0}, '%') and user_type=#{1} and col_id=#{2}
+                                            or col_id like concat('%', #{0}, '%') and user_type=#{1} and col_id=#{2}
+                                            or email like concat('%', #{0}, '%') and user_type=#{1} and col_id=#{2}
+    </select>
+
+    <select id="selectCount" resultType="int">
+        select count from user where  col_id=#{0} and user_type=#{1}
+    </select>
+</mapper>
